@@ -230,7 +230,7 @@ func TestExtractApplications(t *testing.T) {
 				Cache:         &fakeCache{},
 			}
 
-			got, reason, err := r.generateApplications(log.NewEntry(log.StandardLogger()), v1alpha1.ApplicationSet{
+			got, reason, err := r.GenerateApplications(log.NewEntry(log.StandardLogger()), v1alpha1.ApplicationSet{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "namespace",
@@ -343,7 +343,7 @@ func TestMergeTemplateApplications(t *testing.T) {
 				KubeClientset: kubefake.NewSimpleClientset(),
 			}
 
-			got, _, _ := r.generateApplications(log.NewEntry(log.StandardLogger()), v1alpha1.ApplicationSet{
+			got, _, _ := r.GenerateApplications(log.NewEntry(log.StandardLogger()), v1alpha1.ApplicationSet{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "name",
 					Namespace: "namespace",
@@ -2909,7 +2909,7 @@ func TestGenerateAppsUsingPullRequestGenerator(t *testing.T) {
 				KubeClientset: kubefake.NewSimpleClientset(),
 			}
 
-			gotApp, _, _ := appSetReconciler.generateApplications(log.NewEntry(log.StandardLogger()), v1alpha1.ApplicationSet{
+			gotApp, _, _ := appSetReconciler.GenerateApplications(log.NewEntry(log.StandardLogger()), v1alpha1.ApplicationSet{
 				Spec: v1alpha1.ApplicationSetSpec{
 					GoTemplate: true,
 					Generators: []v1alpha1.ApplicationSetGenerator{{

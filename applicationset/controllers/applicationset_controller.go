@@ -124,7 +124,7 @@ func (r *ApplicationSetReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	// Log a warning if there are unrecognized generators
 	_ = utils.CheckInvalidGenerators(&applicationSetInfo)
 	// desiredApplications is the main list of all expected Applications from all generators in this appset.
-	desiredApplications, applicationSetReason, err := r.generateApplications(logCtx, applicationSetInfo)
+	desiredApplications, applicationSetReason, err := r.GenerateApplications(logCtx, applicationSetInfo)
 	if err != nil {
 		_ = r.setApplicationSetStatusCondition(ctx,
 			&applicationSetInfo,
@@ -499,7 +499,7 @@ func getTempApplication(applicationSetTemplate argov1alpha1.ApplicationSetTempla
 	return &tmplApplication
 }
 
-func (r *ApplicationSetReconciler) generateApplications(logCtx *log.Entry, applicationSetInfo argov1alpha1.ApplicationSet) ([]argov1alpha1.Application, argov1alpha1.ApplicationSetReasonType, error) {
+func (r *ApplicationSetReconciler) GenerateApplications(logCtx *log.Entry, applicationSetInfo argov1alpha1.ApplicationSet) ([]argov1alpha1.Application, argov1alpha1.ApplicationSetReasonType, error) {
 	var res []argov1alpha1.Application
 
 	var firstError error

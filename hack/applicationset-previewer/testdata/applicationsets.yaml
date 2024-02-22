@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: origin
+  namespace: argocd
+spec:
+  generators:
+    - matrix:
+        generators:
+          - list:
+              elements:
+                - project: datalake
+                - project: extractors
+                - project: platform-infrastructure
+                - project: identity-management
+                - project: team-engine
+                - project: mlops
+          - clusters:
+              selector:
+                matchExpression:
+                  - key: env
+                    operator: In
+                    values:
+                      - prod
+  template:
+    metadata:
+      name: "{{project}}-applicationsets-{{name}}"
+    spec:
+      project: platform-infrastructure
+      source:
+        repoURL: git@github.com:example/project-foo
+        targetRevision: HEAD
+        path: "kubernetes/applicationsets/projects/{{project}}"
+      destination:
+        namespace: "{{project}}"
+        server: "{{server}}"
+      syncPolicy:
+        automated: null
+        syncOptions:
+          - CreateNamespace=false
+  syncPolicy:
+    preserveResourcesOnDeletion: true

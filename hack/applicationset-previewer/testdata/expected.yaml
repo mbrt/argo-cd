@@ -1,0 +1,450 @@
+---
+metadata:
+  creationTimestamp: null
+  name: datalake-applicationsets-in-cluster
+spec:
+  destination:
+    namespace: datalake
+    server: https://kubernetes.default.svc
+  project: platform-infrastructure
+  source:
+    path: kubernetes/applicationsets/projects/datalake
+    repoURL: git@github.com:example/project-foo
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=false
+status:
+  health: {}
+  summary: {}
+  sync:
+    comparedTo:
+      destination: {}
+      source:
+        repoURL: ""
+    status: ""
+---
+metadata:
+  creationTimestamp: null
+  name: datalake-applicationsets-mycluster
+spec:
+  destination:
+    namespace: datalake
+    server: https://mycluster.example.com
+  project: platform-infrastructure
+  source:
+    path: kubernetes/applicationsets/projects/datalake
+    repoURL: git@github.com:example/project-foo
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=false
+status:
+  health: {}
+  summary: {}
+  sync:
+    comparedTo:
+      destination: {}
+      source:
+        repoURL: ""
+    status: ""
+---
+metadata:
+  creationTimestamp: null
+  name: datalake-applicationsets-mycluster-dev
+spec:
+  destination:
+    namespace: datalake
+    server: https://mycluster-dev.example.com
+  project: platform-infrastructure
+  source:
+    path: kubernetes/applicationsets/projects/datalake
+    repoURL: git@github.com:example/project-foo
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=false
+status:
+  health: {}
+  summary: {}
+  sync:
+    comparedTo:
+      destination: {}
+      source:
+        repoURL: ""
+    status: ""
+---
+metadata:
+  creationTimestamp: null
+  name: extractors-applicationsets-in-cluster
+spec:
+  destination:
+    namespace: extractors
+    server: https://kubernetes.default.svc
+  project: platform-infrastructure
+  source:
+    path: kubernetes/applicationsets/projects/extractors
+    repoURL: git@github.com:example/project-foo
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=false
+status:
+  health: {}
+  summary: {}
+  sync:
+    comparedTo:
+      destination: {}
+      source:
+        repoURL: ""
+    status: ""
+---
+metadata:
+  creationTimestamp: null
+  name: extractors-applicationsets-mycluster
+spec:
+  destination:
+    namespace: extractors
+    server: https://mycluster.example.com
+  project: platform-infrastructure
+  source:
+    path: kubernetes/applicationsets/projects/extractors
+    repoURL: git@github.com:example/project-foo
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=false
+status:
+  health: {}
+  summary: {}
+  sync:
+    comparedTo:
+      destination: {}
+      source:
+        repoURL: ""
+    status: ""
+---
+metadata:
+  creationTimestamp: null
+  name: extractors-applicationsets-mycluster-dev
+spec:
+  destination:
+    namespace: extractors
+    server: https://mycluster-dev.example.com
+  project: platform-infrastructure
+  source:
+    path: kubernetes/applicationsets/projects/extractors
+    repoURL: git@github.com:example/project-foo
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=false
+status:
+  health: {}
+  summary: {}
+  sync:
+    comparedTo:
+      destination: {}
+      source:
+        repoURL: ""
+    status: ""
+---
+metadata:
+  creationTimestamp: null
+  name: platform-infrastructure-applicationsets-in-cluster
+spec:
+  destination:
+    namespace: platform-infrastructure
+    server: https://kubernetes.default.svc
+  project: platform-infrastructure
+  source:
+    path: kubernetes/applicationsets/projects/platform-infrastructure
+    repoURL: git@github.com:example/project-foo
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=false
+status:
+  health: {}
+  summary: {}
+  sync:
+    comparedTo:
+      destination: {}
+      source:
+        repoURL: ""
+    status: ""
+---
+metadata:
+  creationTimestamp: null
+  name: platform-infrastructure-applicationsets-mycluster
+spec:
+  destination:
+    namespace: platform-infrastructure
+    server: https://mycluster.example.com
+  project: platform-infrastructure
+  source:
+    path: kubernetes/applicationsets/projects/platform-infrastructure
+    repoURL: git@github.com:example/project-foo
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=false
+status:
+  health: {}
+  summary: {}
+  sync:
+    comparedTo:
+      destination: {}
+      source:
+        repoURL: ""
+    status: ""
+---
+metadata:
+  creationTimestamp: null
+  name: platform-infrastructure-applicationsets-mycluster-dev
+spec:
+  destination:
+    namespace: platform-infrastructure
+    server: https://mycluster-dev.example.com
+  project: platform-infrastructure
+  source:
+    path: kubernetes/applicationsets/projects/platform-infrastructure
+    repoURL: git@github.com:example/project-foo
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=false
+status:
+  health: {}
+  summary: {}
+  sync:
+    comparedTo:
+      destination: {}
+      source:
+        repoURL: ""
+    status: ""
+---
+metadata:
+  creationTimestamp: null
+  name: identity-management-applicationsets-in-cluster
+spec:
+  destination:
+    namespace: identity-management
+    server: https://kubernetes.default.svc
+  project: platform-infrastructure
+  source:
+    path: kubernetes/applicationsets/projects/identity-management
+    repoURL: git@github.com:example/project-foo
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=false
+status:
+  health: {}
+  summary: {}
+  sync:
+    comparedTo:
+      destination: {}
+      source:
+        repoURL: ""
+    status: ""
+---
+metadata:
+  creationTimestamp: null
+  name: identity-management-applicationsets-mycluster
+spec:
+  destination:
+    namespace: identity-management
+    server: https://mycluster.example.com
+  project: platform-infrastructure
+  source:
+    path: kubernetes/applicationsets/projects/identity-management
+    repoURL: git@github.com:example/project-foo
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=false
+status:
+  health: {}
+  summary: {}
+  sync:
+    comparedTo:
+      destination: {}
+      source:
+        repoURL: ""
+    status: ""
+---
+metadata:
+  creationTimestamp: null
+  name: identity-management-applicationsets-mycluster-dev
+spec:
+  destination:
+    namespace: identity-management
+    server: https://mycluster-dev.example.com
+  project: platform-infrastructure
+  source:
+    path: kubernetes/applicationsets/projects/identity-management
+    repoURL: git@github.com:example/project-foo
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=false
+status:
+  health: {}
+  summary: {}
+  sync:
+    comparedTo:
+      destination: {}
+      source:
+        repoURL: ""
+    status: ""
+---
+metadata:
+  creationTimestamp: null
+  name: team-engine-applicationsets-in-cluster
+spec:
+  destination:
+    namespace: team-engine
+    server: https://kubernetes.default.svc
+  project: platform-infrastructure
+  source:
+    path: kubernetes/applicationsets/projects/team-engine
+    repoURL: git@github.com:example/project-foo
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=false
+status:
+  health: {}
+  summary: {}
+  sync:
+    comparedTo:
+      destination: {}
+      source:
+        repoURL: ""
+    status: ""
+---
+metadata:
+  creationTimestamp: null
+  name: team-engine-applicationsets-mycluster
+spec:
+  destination:
+    namespace: team-engine
+    server: https://mycluster.example.com
+  project: platform-infrastructure
+  source:
+    path: kubernetes/applicationsets/projects/team-engine
+    repoURL: git@github.com:example/project-foo
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=false
+status:
+  health: {}
+  summary: {}
+  sync:
+    comparedTo:
+      destination: {}
+      source:
+        repoURL: ""
+    status: ""
+---
+metadata:
+  creationTimestamp: null
+  name: team-engine-applicationsets-mycluster-dev
+spec:
+  destination:
+    namespace: team-engine
+    server: https://mycluster-dev.example.com
+  project: platform-infrastructure
+  source:
+    path: kubernetes/applicationsets/projects/team-engine
+    repoURL: git@github.com:example/project-foo
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=false
+status:
+  health: {}
+  summary: {}
+  sync:
+    comparedTo:
+      destination: {}
+      source:
+        repoURL: ""
+    status: ""
+---
+metadata:
+  creationTimestamp: null
+  name: mlops-applicationsets-in-cluster
+spec:
+  destination:
+    namespace: mlops
+    server: https://kubernetes.default.svc
+  project: platform-infrastructure
+  source:
+    path: kubernetes/applicationsets/projects/mlops
+    repoURL: git@github.com:example/project-foo
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=false
+status:
+  health: {}
+  summary: {}
+  sync:
+    comparedTo:
+      destination: {}
+      source:
+        repoURL: ""
+    status: ""
+---
+metadata:
+  creationTimestamp: null
+  name: mlops-applicationsets-mycluster
+spec:
+  destination:
+    namespace: mlops
+    server: https://mycluster.example.com
+  project: platform-infrastructure
+  source:
+    path: kubernetes/applicationsets/projects/mlops
+    repoURL: git@github.com:example/project-foo
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=false
+status:
+  health: {}
+  summary: {}
+  sync:
+    comparedTo:
+      destination: {}
+      source:
+        repoURL: ""
+    status: ""
+---
+metadata:
+  creationTimestamp: null
+  name: mlops-applicationsets-mycluster-dev
+spec:
+  destination:
+    namespace: mlops
+    server: https://mycluster-dev.example.com
+  project: platform-infrastructure
+  source:
+    path: kubernetes/applicationsets/projects/mlops
+    repoURL: git@github.com:example/project-foo
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=false
+status:
+  health: {}
+  summary: {}
+  sync:
+    comparedTo:
+      destination: {}
+      source:
+        repoURL: ""
+    status: ""
