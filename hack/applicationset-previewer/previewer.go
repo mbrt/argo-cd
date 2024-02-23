@@ -44,6 +44,8 @@ func Generate(filePaths []string) ([]appv1alpha1.Application, error) {
 	var res []appv1alpha1.Application
 	asets := filterAppSets(objects)
 
+	log.Infof("Processing %d ApplicationSets and %d secrets", len(asets), len(objects)-len(asets))
+
 	for _, as := range asets {
 		lg := log.StandardLogger()
 		lg.SetLevel(log.ErrorLevel)
