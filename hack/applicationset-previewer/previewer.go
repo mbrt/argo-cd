@@ -159,22 +159,39 @@ func appControllerIndexer(rawObj client.Object) []string {
 }
 
 func parseYAMLs(yamlPaths []string) ([]client.Object, error) {
-	var res []client.Object
+	var (
+		res      []client.Object
+		contents [][]byte
+	)
 	for _, path := range yamlPaths {
 		b, err := os.ReadFile(path)
 		if err != nil {
 			return nil, fmt.Errorf("reading yaml: %w", err)
 		}
-		obj, err := parseYAML(b)
+		contents = append(contents, b)
+	}
+	if len(contents) == 0 {
+		b, err := io.ReadAll(os.Stdin)
 		if err != nil {
-			return nil, fmt.Errorf("parsing yaml %q: %w", path, err)
+			return nil, fmt.Errorf("reading yaml from stdin: %w", err)
+		}
+		contents = append(contents, b)
+		// For debugging.
+		yamlPaths = append(yamlPaths, "stdin")
+	}
+
+	for i, b := range contents {
+		obj, err := parseYAML(b, yamlPaths[i])
+		if err != nil {
+			return nil, fmt.Errorf("parsing yaml: %w", err)
 		}
 		res = append(res, obj...)
 	}
+
 	return res, nil
 }
 
-func parseYAML(yml []byte) ([]client.Object, error) {
+func parseYAML(yml []byte, fname string) ([]client.Object, error) {
 	// Only secrets and ApplicationSets are supported.
 	yamls, err := kube.SplitYAMLToString(yml)
 	if err != nil {
@@ -187,7 +204,7 @@ func parseYAML(yml []byte) ([]client.Object, error) {
 		// Determine which object we're dealing with.
 		var meta metav1.TypeMeta
 		if err := config.Unmarshal([]byte(yml), &meta); err != nil {
-			return nil, fmt.Errorf("unmarshalling type meta: %w", err)
+			return nil, fmt.Errorf("%s: unmarshalling type meta: %w", fname, err)
 		}
 		var obj client.Object
 		switch meta.Kind {
@@ -196,11 +213,12 @@ func parseYAML(yml []byte) ([]client.Object, error) {
 		case "ApplicationSet":
 			obj = &appv1alpha1.ApplicationSet{}
 		default:
-			return nil, fmt.Errorf("unsupported kind %q", meta.Kind)
+			log.Warnf("Path: %s, Ignored unsupported kind: %s", fname, meta.Kind)
+			continue
 		}
 		// Parse the object with the right type.
 		if err := config.Unmarshal([]byte(yml), obj); err != nil {
-			return nil, fmt.Errorf("unmarshalling type meta: %w", err)
+			return nil, fmt.Errorf("%s: unmarshalling type meta: %w", fname, err)
 		}
 		if meta.Kind == "Secret" {
 			fixupSecret(obj.(*corev1.Secret))

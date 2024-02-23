@@ -1,6 +1,8 @@
 // Generate Applications from ApplicationSets locally. This only requires
 // cluster secrets and ApplicationSets manifests to be available locally.
 //
+// Accepts inputs from stdin or from files.
+//
 // Usage: applicationset-previewer <appset1.yaml,appset2.yaml> <secrets1.yaml,secrets2.yaml>
 package main
 
