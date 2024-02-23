@@ -17,7 +17,7 @@ spec:
                 - project: mlops
           - clusters:
               selector:
-                matchExpression:
+                matchExpressions:
                   - key: env
                     operator: In
                     values:
