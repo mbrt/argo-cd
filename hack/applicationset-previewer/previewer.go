@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"io"
 	"os"
@@ -223,7 +222,9 @@ func parseYAML(yml []byte, fname string) ([]client.Object, error) {
 			return nil, fmt.Errorf("%s: unmarshalling type meta: %w", fname, err)
 		}
 		if meta.Kind == "Secret" {
-			fixupSecret(obj.(*corev1.Secret))
+			if err := fixupSecret(obj.(*corev1.Secret)); err != nil {
+				return nil, fmt.Errorf("%s: decoding secret: %w", fname, err)
+			}
 		}
 		res = append(res, obj)
 	}
@@ -235,13 +236,6 @@ func fixupSecret(secret *corev1.Secret) error {
 	// Decode possibly encoded data.
 	if secret.Data == nil {
 		secret.Data = map[string][]byte{}
-	}
-	for k, v := range secret.Data {
-		var err error
-		secret.Data[k], err = base64.StdEncoding.DecodeString(string(v))
-		if err != nil {
-			return fmt.Errorf("decoding secret: %w", err)
-		}
 	}
 	// Move string data to data.
 	for k, v := range secret.StringData {
