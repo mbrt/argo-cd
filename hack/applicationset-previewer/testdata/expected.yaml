@@ -57,33 +57,6 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   creationTimestamp: null
-  name: platform-infrastructure-applicationsets-mycluster
-spec:
-  destination:
-    namespace: platform-infrastructure
-    server: https://mycluster.example.com
-  project: platform-infrastructure
-  source:
-    path: kubernetes/applicationsets/projects/platform-infrastructure
-    repoURL: git@github.com:example/project-foo
-    targetRevision: HEAD
-  syncPolicy:
-    syncOptions:
-    - CreateNamespace=false
-status:
-  health: {}
-  summary: {}
-  sync:
-    comparedTo:
-      destination: {}
-      source:
-        repoURL: ""
-    status: ""
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  creationTimestamp: null
   name: identity-management-applicationsets-mycluster
 spec:
   destination:
@@ -111,14 +84,14 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   creationTimestamp: null
-  name: team-engine-applicationsets-mycluster
+  name: mlops-applicationsets-mycluster
 spec:
   destination:
-    namespace: team-engine
+    namespace: mlops
     server: https://mycluster.example.com
   project: platform-infrastructure
   source:
-    path: kubernetes/applicationsets/projects/team-engine
+    path: kubernetes/applicationsets/projects/mlops
     repoURL: git@github.com:example/project-foo
     targetRevision: HEAD
   syncPolicy:
@@ -138,14 +111,41 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   creationTimestamp: null
-  name: mlops-applicationsets-mycluster
+  name: platform-infrastructure-applicationsets-mycluster
 spec:
   destination:
-    namespace: mlops
+    namespace: platform-infrastructure
     server: https://mycluster.example.com
   project: platform-infrastructure
   source:
-    path: kubernetes/applicationsets/projects/mlops
+    path: kubernetes/applicationsets/projects/platform-infrastructure
+    repoURL: git@github.com:example/project-foo
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=false
+status:
+  health: {}
+  summary: {}
+  sync:
+    comparedTo:
+      destination: {}
+      source:
+        repoURL: ""
+    status: ""
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  creationTimestamp: null
+  name: team-engine-applicationsets-mycluster
+spec:
+  destination:
+    namespace: team-engine
+    server: https://mycluster.example.com
+  project: platform-infrastructure
+  source:
+    path: kubernetes/applicationsets/projects/team-engine
     repoURL: git@github.com:example/project-foo
     targetRevision: HEAD
   syncPolicy:

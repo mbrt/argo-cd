@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sort"
 
 	log "github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
@@ -58,11 +59,19 @@ func Generate(filePaths []string) ([]appv1alpha1.Application, error) {
 		res = append(res, apps...)
 	}
 
+	// Sort the results for reproducibility.
+	sort.Slice(res, func(i, j int) bool {
+		if res[i].Namespace != res[j].Namespace {
+			return res[i].Namespace < res[j].Namespace
+		}
+		return res[i].Name < res[j].Name
+	})
+
 	return res, nil
 }
 
-func DumpApps(w io.Writer, appsets []appv1alpha1.Application) {
-	for _, as := range appsets {
+func DumpApps(w io.Writer, apps []appv1alpha1.Application) {
+	for _, as := range apps {
 		data, _ := yaml.Marshal(as)
 		w.Write([]byte("---\n"))
 		w.Write(data)
