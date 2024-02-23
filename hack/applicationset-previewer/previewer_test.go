@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"os"
 	"testing"
@@ -9,29 +10,30 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// update is useful to regenerate the golden files
+// update is useful to regenerate the golden test files.
 // Make sure the new version makes sense!!
 var update = flag.Bool("update", false, "update golden files")
 
 func TestGenerate(t *testing.T) {
-	apps, err := Generate([]string{"testdata/applicationsets.yaml"}, []string{"testdata/secrets.yaml"})
+	apps, err := Generate([]string{"testdata/applicationsets.yaml", "testdata/secrets.yaml"})
 	assert.NoError(t, err)
-	got := DumpApps(apps)
+	var out bytes.Buffer
+	DumpApps(&out, apps)
 
 	if *update {
-		err := os.WriteFile("testdata/expected.yaml", []byte(got), 0644)
+		err := os.WriteFile("testdata/expected.yaml", out.Bytes(), 0644)
 		assert.NoError(t, err)
 		t.Skip("update flag is set")
 		return
 	}
 
-	want := readYaml(t, "testdata/expected.yaml")
-	if diff := cmp.Diff(want, got); diff != "" {
+	want := mustReadFile(t, "testdata/expected.yaml")
+	if diff := cmp.Diff(want, out.String()); diff != "" {
 		t.Errorf("Unexpected diff:\n%s\n", diff)
 	}
 }
 
-func readYaml(t *testing.T, path string) string {
+func mustReadFile(t *testing.T, path string) string {
 	b, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)

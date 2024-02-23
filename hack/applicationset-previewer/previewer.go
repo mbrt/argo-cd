@@ -1,10 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"encoding/base64"
 	"fmt"
+	"io"
 	"os"
 
 	log "github.com/sirupsen/logrus"
@@ -23,7 +23,6 @@ import (
 	"github.com/argoproj/argo-cd/v2/applicationset/controllers"
 	"github.com/argoproj/argo-cd/v2/applicationset/generators"
 	"github.com/argoproj/argo-cd/v2/applicationset/utils"
-	"github.com/argoproj/argo-cd/v2/cmd/util"
 	appv1alpha1 "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	appclientset "github.com/argoproj/argo-cd/v2/pkg/client/clientset/versioned/fake"
 	"github.com/argoproj/argo-cd/v2/util/config"
@@ -31,26 +30,11 @@ import (
 	"github.com/argoproj/gitops-engine/pkg/utils/kube"
 )
 
-func Generate(filePaths, secretsPaths []string) ([]appv1alpha1.Application, error) {
-	var asets []*appv1alpha1.ApplicationSet
-	for _, filePath := range filePaths {
-		chunk, err := util.ConstructApplicationSet(filePath)
-		if err != nil {
-			return nil, fmt.Errorf("loading appsets: %w", err)
-		}
-		if err := dumpAppSets(asets); err != nil {
-			return nil, err
-		}
-		asets = append(asets, chunk...)
-	}
-
-	secrets, err := readSecretsYAML(secretsPaths)
+func Generate(filePaths []string) ([]appv1alpha1.Application, error) {
+	objects, err := parseYAMLs(filePaths)
 	if err != nil {
-		return nil, fmt.Errorf("loading secrets: %w", err)
+		return nil, fmt.Errorf("parsing yaml: %w", err)
 	}
-
-	objects := toClientObjects(asets)
-	objects = append(objects, secrets...)
 
 	cntr, err := newController(context.Background(), objects)
 	if err != nil {
@@ -58,6 +42,8 @@ func Generate(filePaths, secretsPaths []string) ([]appv1alpha1.Application, erro
 	}
 
 	var res []appv1alpha1.Application
+	asets := filterAppSets(objects)
+
 	for _, as := range asets {
 		lg := log.StandardLogger()
 		lg.SetLevel(log.ErrorLevel)
@@ -65,31 +51,31 @@ func Generate(filePaths, secretsPaths []string) ([]appv1alpha1.Application, erro
 		if err != nil {
 			return nil, err
 		}
+		for i := range apps {
+			fixupApp(&apps[i])
+		}
 		res = append(res, apps...)
 	}
 
 	return res, nil
 }
 
-func DumpApps(appsets []appv1alpha1.Application) string {
-	var buf bytes.Buffer
+func DumpApps(w io.Writer, appsets []appv1alpha1.Application) {
 	for _, as := range appsets {
 		data, _ := yaml.Marshal(as)
-		buf.WriteString("---\n")
-		buf.WriteString(string(data))
+		w.Write([]byte("---\n"))
+		w.Write(data)
 	}
-	return buf.String()
 }
 
-func dumpAppSets(appsets []*appv1alpha1.ApplicationSet) error {
-	for _, as := range appsets {
-		data, err := yaml.Marshal(as)
-		if err != nil {
-			return fmt.Errorf("marshalling appset: %w", err)
+func filterAppSets(objs []client.Object) []*appv1alpha1.ApplicationSet {
+	var res []*appv1alpha1.ApplicationSet
+	for _, obj := range objs {
+		if obj.GetObjectKind().GroupVersionKind().Kind == "ApplicationSet" {
+			res = append(res, obj.(*appv1alpha1.ApplicationSet))
 		}
-		fmt.Println(string(data))
 	}
-	return nil
+	return res
 }
 
 func newController(ctx context.Context, objs []client.Object) (*controllers.ApplicationSetReconciler, error) {
@@ -172,25 +158,24 @@ func appControllerIndexer(rawObj client.Object) []string {
 	return []string{owner.Name}
 }
 
-func readSecretsYAML(secretsPaths []string) ([]client.Object, error) {
+func parseYAMLs(yamlPaths []string) ([]client.Object, error) {
 	var res []client.Object
-
-	for _, path := range secretsPaths {
+	for _, path := range yamlPaths {
 		b, err := os.ReadFile(path)
 		if err != nil {
-			return nil, fmt.Errorf("reading secrets file: %w", err)
+			return nil, fmt.Errorf("reading yaml: %w", err)
 		}
-		objs, err := readSecrets(b)
+		obj, err := parseYAML(b)
 		if err != nil {
-			return nil, fmt.Errorf("reading secrets: %w", err)
+			return nil, fmt.Errorf("parsing yaml %q: %w", path, err)
 		}
-		res = append(res, objs...)
+		res = append(res, obj...)
 	}
-
 	return res, nil
 }
 
-func readSecrets(yml []byte) ([]client.Object, error) {
+func parseYAML(yml []byte) ([]client.Object, error) {
+	// Only secrets and ApplicationSets are supported.
 	yamls, err := kube.SplitYAMLToString(yml)
 	if err != nil {
 		return nil, fmt.Errorf("splitting YAML to string: %w", err)
@@ -199,19 +184,34 @@ func readSecrets(yml []byte) ([]client.Object, error) {
 	var res []client.Object
 
 	for _, yml := range yamls {
-		var secret corev1.Secret
-		err = config.Unmarshal([]byte(yml), &secret)
-		if err != nil {
-			return nil, fmt.Errorf("unmarshalling appset: %w", err)
+		// Determine which object we're dealing with.
+		var meta metav1.TypeMeta
+		if err := config.Unmarshal([]byte(yml), &meta); err != nil {
+			return nil, fmt.Errorf("unmarshalling type meta: %w", err)
 		}
-		fixSecret(&secret)
-		res = append(res, &secret)
+		var obj client.Object
+		switch meta.Kind {
+		case "Secret":
+			obj = &corev1.Secret{}
+		case "ApplicationSet":
+			obj = &appv1alpha1.ApplicationSet{}
+		default:
+			return nil, fmt.Errorf("unsupported kind %q", meta.Kind)
+		}
+		// Parse the object with the right type.
+		if err := config.Unmarshal([]byte(yml), obj); err != nil {
+			return nil, fmt.Errorf("unmarshalling type meta: %w", err)
+		}
+		if meta.Kind == "Secret" {
+			fixupSecret(obj.(*corev1.Secret))
+		}
+		res = append(res, obj)
 	}
 
 	return res, nil
 }
 
-func fixSecret(secret *corev1.Secret) error {
+func fixupSecret(secret *corev1.Secret) error {
 	// Decode possibly encoded data.
 	if secret.Data == nil {
 		secret.Data = map[string][]byte{}
@@ -230,6 +230,11 @@ func fixSecret(secret *corev1.Secret) error {
 	return nil
 }
 
+func fixupApp(app *appv1alpha1.Application) {
+	app.APIVersion = appv1alpha1.SchemeGroupVersion.String()
+	app.Kind = appv1alpha1.ApplicationSchemaGroupVersionKind.Kind
+}
+
 func filterKind(objs []client.Object, kind string) []client.Object {
 	res := []client.Object{}
 	for _, obj := range objs {
@@ -244,14 +249,6 @@ func toRuntimeObjects(objs []client.Object) []runtime.Object {
 	res := []runtime.Object{}
 	for _, clientCluster := range objs {
 		res = append(res, clientCluster)
-	}
-	return res
-}
-
-func toClientObjects(asets []*appv1alpha1.ApplicationSet) []client.Object {
-	res := []client.Object{}
-	for _, as := range asets {
-		res = append(res, as)
 	}
 	return res
 }

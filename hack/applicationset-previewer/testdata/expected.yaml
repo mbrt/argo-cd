@@ -1,4 +1,6 @@
 ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
 metadata:
   creationTimestamp: null
   name: datalake-applicationsets-mycluster
@@ -24,6 +26,8 @@ status:
         repoURL: ""
     status: ""
 ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
 metadata:
   creationTimestamp: null
   name: extractors-applicationsets-mycluster
@@ -49,6 +53,8 @@ status:
         repoURL: ""
     status: ""
 ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
 metadata:
   creationTimestamp: null
   name: platform-infrastructure-applicationsets-mycluster
@@ -74,6 +80,8 @@ status:
         repoURL: ""
     status: ""
 ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
 metadata:
   creationTimestamp: null
   name: identity-management-applicationsets-mycluster
@@ -99,6 +107,8 @@ status:
         repoURL: ""
     status: ""
 ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
 metadata:
   creationTimestamp: null
   name: team-engine-applicationsets-mycluster
@@ -124,6 +134,8 @@ status:
         repoURL: ""
     status: ""
 ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
 metadata:
   creationTimestamp: null
   name: mlops-applicationsets-mycluster
