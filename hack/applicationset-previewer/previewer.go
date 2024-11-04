@@ -173,21 +173,15 @@ func parseYAMLs(yamlPaths []string) ([]client.Object, error) {
 		res      []client.Object
 		contents [][]byte
 	)
-	for _, path := range yamlPaths {
-		b, err := os.ReadFile(path)
-		if err != nil {
-			return nil, fmt.Errorf("reading yaml: %w", err)
-		}
-		contents = append(contents, b)
+	if len(yamlPaths) == 0 {
+		yamlPaths = []string{"-"}
 	}
-	if len(contents) == 0 {
-		b, err := io.ReadAll(os.Stdin)
+	for _, path := range yamlPaths {
+		b, err := readPath(path)
 		if err != nil {
-			return nil, fmt.Errorf("reading yaml from stdin: %w", err)
+			return nil, fmt.Errorf("reading yaml from %q: %w", path, err)
 		}
 		contents = append(contents, b)
-		// For debugging.
-		yamlPaths = append(yamlPaths, "stdin")
 	}
 
 	for i, b := range contents {
@@ -199,6 +193,13 @@ func parseYAMLs(yamlPaths []string) ([]client.Object, error) {
 	}
 
 	return res, nil
+}
+
+func readPath(path string) ([]byte, error) {
+	if path == "-" {
+		return io.ReadAll(os.Stdin)
+	}
+	return os.ReadFile(path)
 }
 
 func parseYAML(yml []byte, fname string) ([]client.Object, error) {
